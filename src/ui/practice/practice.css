@@ -1,0 +1,488 @@
+/*
+ * Practice page. Calm, uncluttered, generous spacing; 320 px → large screens; phone-first at 360 px.
+ * Colours only from tokens.css. Motion ≤ 800 ms and off with reduced motion (--celebrate-ms = 0).
+ */
+
+/* ── Topic accents ───────────────────────────────────── */
+.accent-none { --accent: var(--primary); --accent-bg: var(--primary-soft); }
+.accent-zahlen { --accent: var(--topic-zahlen); --accent-bg: var(--topic-zahlen-bg); }
+.accent-rechnen { --accent: var(--topic-rechnen); --accent-bg: var(--topic-rechnen-bg); }
+.accent-ganzzahlen { --accent: var(--topic-ganzzahlen); --accent-bg: var(--topic-ganzzahlen-bg); }
+.accent-brueche { --accent: var(--topic-brueche); --accent-bg: var(--topic-brueche-bg); }
+.accent-groessen { --accent: var(--topic-groessen); --accent-bg: var(--topic-groessen-bg); }
+.accent-geometrie { --accent: var(--topic-geometrie); --accent-bg: var(--topic-geometrie-bg); }
+.accent-flaeche { --accent: var(--topic-flaeche); --accent-bg: var(--topic-flaeche-bg); }
+.accent-daten { --accent: var(--topic-daten); --accent-bg: var(--topic-daten-bg); }
+
+/* ── Page ────────────────────────────────────────────── */
+.practice {
+  width: 100%;
+  max-width: 860px;
+  margin-inline: auto;
+  padding: var(--space-4) var(--space-4) var(--space-7);
+}
+@media (min-width: 1100px) {
+  .practice:has(.has-keypad) { max-width: 1120px; }
+}
+.pr-page { display: flex; flex-direction: column; gap: var(--space-5); }
+
+/* ── Header ──────────────────────────────────────────── */
+.pr-header {
+  background: var(--surface);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-1);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.pr-header__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.pr-header__titles { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-1); min-width: 0; }
+/* Topic chip (assist chip in the topic's tonal colour) */
+.pr-header__kicker {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-s);
+  background: var(--accent-bg);
+  color: var(--text);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+}
+.pr-header__title {
+  margin: 0;
+  font-size: var(--fs-h2);
+  overflow-wrap: anywhere;
+}
+/* Small phones: long skill titles ('Geschichten: Geld, Länge, Zeit') fit without breaking inside a word. */
+@media (max-width: 360px) {
+  .pr-header__title { font-size: var(--fs-lead); }
+}
+.pr-header__stufe {
+  display: inline-block;
+  margin-left: var(--space-3);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-s);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.pr-header__buttons { display: flex; flex-wrap: wrap; gap: var(--gap-tap); }
+.pr-header__example.is-open { background: var(--secondary-soft); border-color: transparent; color: var(--on-secondary-soft); }
+
+.pr-progress { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); }
+.pr-progress__text { font-weight: var(--fw-medium); }
+.pr-dots { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.pr-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  transition: background var(--motion-ms), border-color var(--motion-ms);
+}
+.pr-dot.is-done { background: var(--accent); border-color: var(--accent); }
+.pr-dot.is-current { border: 3px solid var(--accent); transform: scale(1.2); }
+
+/* ── Item ────────────────────────────────────────────── */
+.pr-item-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-5); align-items: start; overflow-anchor: none; }
+/* overflow-anchor: feedback appearing above the Ziffernblock must not make the browser scroll the task away
+   (the app scrolls on purpose, see src/ui/answers/fieldNav.ts revealField). */
+@media (min-width: 900px) {
+  .pr-item-layout.has-keypad { grid-template-columns: minmax(0, 1fr) 17rem; }
+  .pr-item-layout.has-keypad .pr-keypad { position: sticky; top: var(--space-4); }
+}
+
+/*
+ * Phones: while the child answers, the Ziffernblock stays at the bottom of the screen and a tall task scrolls behind it, so
+ * the keys never leave the screen (fieldNav.ts keeps the field above it). Not on very low screens such as a phone held
+ * sideways, where it would cover most of the view. Flex column: a sticky grid item could not leave its own row.
+ */
+@media (max-width: 899px) and (min-height: 520px) {
+  .pr-item-layout.keypad-sticks { display: flex; flex-direction: column; align-items: stretch; }
+  .pr-item-layout.keypad-sticks > * { min-width: 0; }
+  .pr-item-layout.keypad-sticks .pr-keypad {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    padding-block: var(--space-2);
+    background: var(--bg);
+    box-shadow: 0 -6px 8px -6px rgb(0 0 0 / 0.25);
+  }
+}
+
+.pr-item { display: flex; flex-direction: column; gap: var(--space-4); }
+.pr-item:focus { outline: none; }
+.pr-item:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
+
+.pr-twin-label {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  margin: 0;
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-s);
+  background: var(--secondary-soft);
+  color: var(--on-secondary-soft);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+}
+
+.pr-read { align-self: flex-end; }
+.pr-read.is-speaking { background: var(--secondary-soft); border-color: transparent; color: var(--on-secondary-soft); }
+
+.pr-context {
+  margin: 0;
+  max-width: var(--measure);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-m);
+  background: var(--surface-low);
+  font-size: var(--fs-body);
+}
+
+.pr-prompt { margin: 0; max-width: var(--measure); font-size: var(--fs-lead); font-weight: var(--fw-medium); }
+
+.pr-expression {
+  margin: var(--space-2) 0;
+  max-width: none;
+  font-size: var(--fs-task);
+  font-weight: var(--fw-strong);
+  line-height: 1.25;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.pr-expression--sm { font-size: var(--fs-h2); }
+
+.pr-visual { margin: 0; }
+.pr-answer { padding: var(--space-2) 0; }
+
+.pr-invalid {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin: 0;
+  max-width: none;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-m);
+  background: var(--surface-high);
+}
+.pr-invalid__icon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  border: 2px solid var(--text-muted);
+  color: var(--text-muted);
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* Short phones: a written calculation is tall, so its card gives up some space to keep the Ziffernblock on the screen (see WrittenInput.css). */
+@media screen and (max-width: 899px) and (max-height: 740px) {
+  .pr-item.card:has(.written-input) { gap: var(--space-2); padding-bottom: var(--space-2); }
+  .pr-item:has(.written-input) .pr-answer { padding-block: 0; }
+}
+
+.pr-hints { display: flex; flex-direction: column; gap: var(--space-2); }
+.pr-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: 0;
+  max-width: var(--measure);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-m);
+  background: var(--primary-soft);
+  color: var(--on-primary-soft);
+}
+.pr-hint svg { flex: none; margin-top: 3px; color: var(--primary); }
+
+/* ── Feedback panels (tonal containers, icon + text, never colour alone) ── */
+.pr-feedback {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-l);
+  background: var(--surface-low);
+}
+.pr-feedback__body { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; flex: 1 1 auto; }
+.pr-feedback__title { margin: 0; font-size: var(--fs-lead); font-weight: var(--fw-medium); }
+.pr-feedback__text { margin: 0; max-width: var(--measure); }
+.pr-feedback__icon { flex: none; }
+
+.pr-feedback--ok { background: var(--ok-soft); color: var(--on-ok-soft); }
+.pr-feedback--ok .pr-check { flex: none; color: var(--ok); }
+.pr-feedback--retry { background: var(--retry-soft); color: var(--on-retry-soft); }
+.pr-feedback--retry .pr-feedback__icon { color: var(--retry); }
+.pr-feedback--solution { background: var(--primary-soft); color: var(--on-primary-soft); }
+.pr-feedback--solution .pr-feedback__icon { color: var(--primary); }
+
+/* Check animation (≤ 800 ms; instant with reduced motion because --celebrate-ms is 0) */
+.pr-check__circle { stroke-dasharray: 132; animation: pr-draw var(--celebrate-ms) ease-out both; }
+.pr-check__tick { stroke-dasharray: 34; animation: pr-draw-tick var(--celebrate-ms) ease-out both; }
+@keyframes pr-draw { from { stroke-dashoffset: 132; } to { stroke-dashoffset: 0; } }
+@keyframes pr-draw-tick { 0%, 45% { stroke-dashoffset: 34; } 100% { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .pr-check__circle, .pr-check__tick, .pr-star, .pr-badge, .pr-mastery__line.is-up .pr-stars { animation: none !important; }
+}
+:root.reduce-motion .pr-check__circle,
+:root.reduce-motion .pr-check__tick,
+:root.reduce-motion .pr-badge,
+:root.reduce-motion .pr-mastery__line.is-up .pr-stars { animation: none !important; }
+
+.pr-streak {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  margin: var(--space-1) 0 0;
+  padding: 2px var(--space-3);
+  border: 1px solid var(--ok);
+  border-radius: var(--radius-s);
+  background: var(--surface);
+  color: var(--ok);
+  font-weight: var(--fw-medium);
+}
+
+.pr-steps { margin: 0; padding-left: 1.6em; display: flex; flex-direction: column; gap: var(--space-2); }
+.pr-steps__step { padding-left: var(--space-1); min-width: 0; }
+
+/*
+ * Long German words and number–unit pairs joined by a no-break space ('16 Kästchenlängen.') must wrap
+ * instead of widening the page (WCAG 1.4.10), also with 'Schrift größer' + 'Mehr Abstand'. Only words that
+ * do not fit on a line at all are broken; no automatic hyphenation (harder to read for young readers).
+ */
+.pr-steps__text,
+.pr-solution,
+.pr-feedback__title,
+.pr-feedback__text,
+.pr-hint,
+.pr-invalid,
+.pr-example__intro,
+.pr-prompt,
+.pr-context {
+  overflow-wrap: anywhere;
+}
+.pr-steps__step::marker { font-weight: var(--fw-strong); }
+.pr-steps__visual { justify-content: flex-start; }
+
+.pr-solution { margin: 0; max-width: var(--measure); font-size: var(--fs-lead); }
+
+/* ── Actions ─────────────────────────────────────────── */
+.pr-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+}
+.pr-actions .btn--lg { min-width: 9rem; }
+.pr-hint-btn svg { color: var(--primary); }
+.pr-hint-btn[aria-disabled='true'] { opacity: 0.6; cursor: default; }
+@media (max-width: 480px) {
+  .pr-actions .btn { flex: 1 1 8rem; }
+  /* the hit areas of the outer buttons take the card padding and the page gutter: they reach the screen edge */
+  .pr-actions .btn:first-child::before { left: calc(-2 * var(--space-4)); }
+  .pr-actions .btn:last-child::before { right: calc(-2 * var(--space-4)); }
+}
+
+/* ── Worked example ──────────────────────────────────── */
+/* T11: a Fachwort that opens its gloss in the text; dotted, so colour is not the only signal. The hit area reaches past the line, the line height stays. */
+.gloss-pair { white-space: nowrap; }
+.gloss-word {
+  position: relative;
+  padding: 0;
+  border: 0;
+  border-bottom: 2px dotted var(--primary);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+.gloss-word::after { content: ''; position: absolute; inset: -12px -4px; }
+.gloss-word:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.gloss-word[aria-expanded='true'] { border-bottom-style: solid; }
+.gloss-text {
+  display: block;
+  margin-block: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-inline-start: 3px solid var(--primary);
+  background: var(--surface-low);
+  color: var(--text);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-regular);
+}
+.gloss-text[hidden] { display: none; }
+@media print { .gloss-text { display: none; } .gloss-word { border-bottom: 0; } }
+
+.pr-example { display: flex; flex-direction: column; gap: var(--space-3); border: 1px solid var(--border-subtle); box-shadow: none; }
+.pr-example:focus { outline: none; }
+.pr-example:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
+.pr-example__heading { margin: 0; }
+.pr-example__intro { margin: 0; font-size: var(--fs-lead); }
+.pr-example__task {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-m);
+  background: var(--surface-low);
+}
+.pr-example__label {
+  margin: 0;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  color: var(--text-muted);
+}
+.pr-example__subheading { margin: var(--space-2) 0 0; font-size: var(--fs-lead); }
+.pr-example__solved { pointer-events: none; }
+/* The solved input is a static picture: hide its input instructions and tools. */
+.pr-example__solved .cells-help,
+.pr-example__solved .nl-input__help,
+
+/* ── Consent, break, messages ────────────────────────── */
+.pr-consent { display: flex; flex-direction: column; gap: var(--space-3); }
+.pr-consent__question { margin: 0; font-size: var(--fs-lead); font-weight: var(--fw-medium); max-width: none; }
+.pr-consent__buttons,
+.pr-pair { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.pr-consent__btn,
+.pr-pair > .btn { flex: 1 1 12rem; }
+.pr-consent__note { margin: 0; color: var(--text-muted); font-size: var(--fs-small); }
+.pr-consent__more { font-size: var(--fs-small); }
+.pr-consent__more > summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  min-width: var(--tap);
+  font-weight: var(--fw-medium);
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}
+.pr-consent__more ul { margin: var(--space-2) 0; padding-left: 1.25em; }
+.pr-consent__more a { display: inline-flex; align-items: center; min-height: var(--tap); }
+.pr-consent--done { margin: 0; color: var(--text-muted); max-width: none; }
+
+.pr-break { display: flex; flex-direction: column; gap: var(--space-3); }
+.pr-break__text { margin: 0; font-size: var(--fs-h2); }
+.pr-break__text:focus { outline: none; }
+
+.pr-message { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-3); }
+.pr-message h2 { margin: 0; }
+.pr-message h2:focus { outline: none; }
+.pr-loading { margin: 0; color: var(--text-muted); }
+
+/* ── Summary ─────────────────────────────────────────── */
+.pr-summary { display: flex; flex-direction: column; gap: var(--space-4); }
+.pr-summary__title { margin: 0; }
+.pr-summary__title:focus { outline: none; }
+.pr-summary__count { margin: 0; font-size: var(--fs-lead); font-weight: var(--fw-medium); max-width: none; }
+.pr-summary__next { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); }
+.pr-summary__next p { margin: 0; color: var(--text-muted); }
+
+.pr-mastery { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
+.pr-mastery__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-m);
+  background: var(--surface-low);
+}
+.pr-mastery__name { font-weight: var(--fw-medium); flex: 1 1 12rem; }
+.pr-mastery__stufe { font-weight: var(--fw-regular); color: var(--text-muted); white-space: nowrap; }
+.pr-mastery__word { font-weight: var(--fw-strong); }
+.pr-mastery__new {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-s);
+  background: var(--ok-soft);
+  color: var(--on-ok-soft);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+}
+.pr-stars { display: inline-flex; gap: 2px; }
+.pr-star { fill: none; stroke: var(--border); }
+.pr-star.is-on { fill: var(--text); stroke: var(--text); }
+
+/* "Das hast du verbessert" (docs/research.md M16): calm lines, the larger improvements with a solid border. */
+.pr-improved__title { margin: 0 0 var(--space-2); }
+.pr-improved__list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
+.pr-improved__line {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-m);
+  background: var(--surface-low);
+}
+.pr-improved__line.is-big { background: var(--ok-soft); color: var(--on-ok-soft); font-weight: var(--fw-medium); }
+.pr-improved__head { display: block; }
+
+.pr-badges__title { margin: 0 0 var(--space-2); }
+.pr-badges__list { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); }
+.pr-badge {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-m);
+  background: var(--accent-bg);
+}
+.pr-badge__text { display: flex; flex-direction: column; gap: var(--space-1); }
+
+
+/* ── Small screens ───────────────────────────────────── */
+@media (max-width: 480px) {
+  /* the page (.site-main) already has a 16 px gutter: no second one, so grids and number lines fit */
+  .practice { padding-inline: 0; }
+  .pr-page .card { padding-inline: var(--space-3); }
+  /* tighter spacing between task, field and Ziffernblock (all three should fit on a phone screen) */
+  .pr-item-layout { gap: var(--space-3); }
+  .pr-item { gap: var(--space-3); }
+  .pr-answer { padding: var(--space-1) 0; }
+  .pr-header { padding: var(--space-3) var(--space-4); }
+  .pr-page .card { padding: var(--space-4); }
+  .pr-header__stufe { margin-left: var(--space-2); }
+  /* 'So geht's' and 'Beenden' side by side where they fit, so the task starts higher on phones. */
+  .pr-header__buttons > .btn { white-space: nowrap; padding-inline: var(--space-4); }
+  /* Feedback: icon above the text, so the text gets the full width of the card. */
+  /* compact feedback: a small icon beside the text and a smaller heading, so the hint, the field and the
+     Ziffernblock fit on the screen together */
+  .pr-feedback { gap: var(--space-2); padding: var(--space-3); }
+  .pr-feedback > svg { align-self: flex-start; width: 28px; height: 28px; }
+  .pr-feedback__title { font-size: var(--fs-body); }
+  .pr-steps { padding-left: 1.25em; }
+  .pr-steps__step { padding-left: 0; }
+  .pr-example__task { padding: var(--space-3); }
+  /* A picture in a worked step or example uses the whole width of its panel: number lines and tables stay readable without sideways scrolling. */
+  .pr-example__task .visual-wrap { margin-inline: calc(-1 * var(--space-3)); }
+  .pr-steps__visual { margin-left: -1.25em; }
+  .pr-feedback--solution .pr-steps__visual { margin-left: calc(-1.25em - 28px - var(--space-2)); margin-right: calc(-1 * var(--space-3)); }
+}
+
+/* ── Print ───────────────────────────────────────────── */
+@media print {
+  .practice { max-width: none; padding: 0; }
+  .pr-header { box-shadow: none; border: 1px solid var(--ink); }
+  .pr-keypad, .pr-consent, .pr-dots { display: none !important; }
+  .pr-feedback, .pr-hint, .pr-context { background: var(--surface); border: 1px solid var(--ink); color: var(--ink); }
+}
+
+
+/* The on-screen pad, one tap away (§7.1): a small line, not a second action. */
+.pr-keypad-toggle { min-height: var(--tap); padding-inline: 0; font-size: var(--fs-small); color: var(--primary); text-decoration: underline; background: none; border: none; }

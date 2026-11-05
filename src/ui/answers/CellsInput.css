@@ -1,0 +1,155 @@
+/*
+ * Toggle grid for "Spiegelbild ergänzen". Cells 72 px where the screen has room; on phones the 4 × 6 grid of the catalogue has to fit
+ * 311 px (296 px at 360), so there a cell is 48 px or 47 px. Colours only from tokens.css.
+ */
+.cells-input {
+  --cells-size: 72px;
+  --cells-gap: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.cells-help {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* 2-D content may scroll sideways on very narrow screens (WCAG 1.4.10 exception). Never up and down: the grid must not move under a finger. */
+.cells-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: var(--space-3);
+}
+
+.cells-grid {
+  position: relative;
+  display: inline-grid;
+  gap: var(--cells-gap);
+  padding: var(--cells-gap);
+  background: var(--grid-line);
+  border-radius: var(--radius-xs);
+}
+
+.cells-cell {
+  position: relative;
+  width: var(--cells-size);
+  height: var(--cells-size);
+  min-width: 48px;
+  min-height: 48px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--surface);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background var(--motion-ms);
+}
+@media (max-width: 640px) {
+  .cells-input { --cells-size: 49px; }
+  .cells-scroll { padding: var(--space-1) 0; }
+}
+.cells-cell:focus-visible { outline: 3px solid var(--focus); outline-offset: -3px; z-index: 2; }
+
+.cells-cell.is-on { background: var(--fill-1); }
+/* The tint alone is under 3:1 on white (WCAG 1.4.11), and an edge would merge with the focus ring: a dark square marks a painted cell. */
+.cells-cell.is-on:not(.is-extra):not(.is-solution) .cells-icon {
+  inset: 28%;
+  background: var(--primary);
+  border-radius: var(--radius-xs);
+}
+
+/* Hover tint only for real pointers: on touch screens the hover state sticks to the last tapped cell,
+   and a cell that was just switched off would still look half painted. */
+@media (hover: hover) and (pointer: fine) {
+  .cells-cell:hover:not([aria-disabled='true']) { background: var(--primary-soft); }
+  .cells-cell.is-on:hover:not([aria-disabled='true']) { background: var(--fill-1); }
+}
+
+/* Given cells: dark stripes with 3:1 on the empty cell and on the tint (WCAG 1.4.11, contrast.test.ts); the tint alone has 1.86:1 on white. */
+.cells-cell.is-given {
+  background: repeating-linear-gradient(45deg, var(--primary) 0 3px, var(--fill-1) 3px 10px);
+  cursor: default;
+}
+
+.cells-cell[aria-disabled='true'] { cursor: default; }
+
+.cells-cell.is-solution {
+  background: var(--ok-soft);
+  box-shadow: inset 0 0 0 3px var(--ok);
+}
+.cells-cell.is-solution .cells-icon { color: var(--ok); }
+
+.cells-cell.is-extra {
+  background: repeating-linear-gradient(-45deg, var(--retry-soft) 0 6px, var(--fill-1) 6px 9px);
+  box-shadow: inset 0 0 0 3px var(--retry);
+}
+.cells-cell.is-extra .cells-icon,
+
+.cells-icon {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.cells-axis {
+  position: absolute;
+  pointer-events: none;
+  z-index: 3;
+}
+.cells-axis--vertical {
+  top: -10px;
+  bottom: -10px;
+  width: 0;
+  margin-left: -2px;
+  border-left: 4px dashed var(--focus);
+}
+.cells-axis--horizontal {
+  left: -10px;
+  right: -10px;
+  height: 0;
+  margin-top: -2px;
+  border-top: 4px dashed var(--focus);
+}
+.cells-summary {
+  margin: 0;
+  color: var(--retry);
+  font-weight: var(--fw-medium);
+  text-align: center;
+}
+
+.cells-print { display: flex; justify-content: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cells-cell { transition: none; }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .cells-help-keys { display: none; }
+}
+
+@media print {
+  .cells-input .cells-help { display: none; }
+}
+
+/* Phones: 48 px cells (the minimum target size) and less padding, so a 6 × 6 grid fits without scrolling. */
+@media (max-width: 480px) {
+  .cells-input { --cells-size: 48px; }
+  .cells-scroll { padding: 1px; }
+  /* the line must not stick out here: that alone would make the grid scroll */
+  .cells-axis--horizontal { left: 0; right: 0; }
+  .cells-axis--vertical { top: 0; bottom: 0; }
+}
+/* The 360 px floor (296 px of room): cells 48 px apart, so that six columns fit without scrolling. */
+@media (max-width: 370px) {
+  .cells-input { --cells-size: 47px; --cells-gap: 1px; }
+}

@@ -1,0 +1,11 @@
+/* Fraction answer: Zähler above a bar, Nenner below, an optional whole to the left. Colours only from tokens.css. */
+.ans-fraction { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); font-size: var(--fs-lead); }
+.ans-fraction__stack { display: inline-flex; flex-direction: column; align-items: stretch; gap: var(--space-2); }
+/* A border, not a background: browsers leave backgrounds out when printing, and a worksheet needs its Bruchstrich. */
+.ans-fraction__bar { display: block; border-top: 3px solid var(--text); }
+.ans-fraction__input { width: 6ch; min-height: var(--tap); padding-inline: var(--space-1); text-align: center; }
+.ans-fraction--print .ans-fraction__bar { border-top-color: var(--ink); }
+.ans-fraction--print { font-size: 12pt; }
+.ans-fraction__toggle { min-height: var(--tap); min-width: var(--tap); }
+.ans-fraction__toggle.is-pressed { background: var(--primary-soft); color: var(--on-primary-soft); border-color: var(--primary); }
+.ans-fraction__sign { font-size: var(--fs-task); font-weight: var(--fw-medium); line-height: 1; }

@@ -1,0 +1,28 @@
+/* Plot a point. Tap only, no drag; step buttons at least 48 px. Colours only from tokens.css. */
+.pt-input { display: flex; flex-direction: column; gap: var(--space-3); max-width: 100%; }
+.pt-input__help { margin: 0; font-size: var(--fs-small); color: var(--text-muted); }
+.pt-input__area { max-width: 100%; margin: 0; touch-action: pan-x pan-y; border-radius: var(--radius-s); cursor: pointer; }
+.pt-input__area.is-disabled { cursor: default; }
+.pt-input__area:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.pt-input__svg { user-select: none; -webkit-user-select: none; }
+.pt-input__controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.pt-input__live { font-family: var(--font-mono); font-size: var(--fs-lead); font-weight: var(--fw-medium); }
+.pt-input__pair { white-space: nowrap; }
+.pt-input__steps {
+  display: grid;
+  grid-template-columns: repeat(3, 48px);
+  grid-template-rows: repeat(2, 48px);
+  gap: var(--space-1);
+}
+.pt-input__step {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 48px; height: 48px; padding: 0;
+  border: 1px solid var(--border); border-radius: var(--radius-s);
+  background: var(--surface); color: var(--primary);
+  cursor: pointer; touch-action: manipulation;
+}
+.pt-input__step:disabled { color: var(--text-muted); cursor: not-allowed; }
+.pt-input__step--ArrowUp { grid-area: 1 / 2; }
+.pt-input__step--ArrowLeft { grid-area: 2 / 1; }
+.pt-input__step--ArrowDown { grid-area: 2 / 2; }
+.pt-input__step--ArrowRight { grid-area: 2 / 3; }

@@ -1,0 +1,105 @@
+/* Written calculation in Kästchen notation (WrittenVisual). Colours only from tokens.css. */
+.written-visual {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  margin-inline: auto;
+  padding: var(--space-2);
+}
+
+.wv-table {
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.wv-cell {
+  position: relative;
+  min-width: 1.9rem;
+  width: 1.9rem;
+  height: 2.2rem;
+  padding: 0;
+  text-align: center;
+  vertical-align: middle;
+  /* squared paper (Kästchenpapier) */
+  border: 1px solid var(--border-subtle);
+}
+
+/* Phones: smaller squares (§6), so that long divisions and 12-digit sums fit the worked solution without scrolling sideways. */
+@media (max-width: 480px) {
+  .wv-table { font-size: 1.25rem; }
+  .wv-cell { min-width: 1.4rem; width: 1.4rem; }
+}
+
+.wv-sign, .wv-op { color: var(--ink); font-weight: 600; }
+
+/* Ergebnisstrich */
+.wv-result > .wv-cell { border-top: 3px solid var(--ink); }
+.wv-top > .wv-cell { border-bottom: 3px solid var(--ink); }
+
+/* Überträge and Entbündeln marks: small digits */
+.wv-carry-row > .wv-cell { height: 1.4rem; font-size: 1rem; }
+.wv-carry { color: var(--topic-rechnen); font-weight: 700; vertical-align: bottom; }
+.wv-regroup-row .wv-carry { vertical-align: bottom; }
+
+/* crossed-out digit (Entbündeln): diagonal stroke, not colour only */
+.wv-struck {
+  background-image: linear-gradient(to top right, transparent calc(50% - 1.5px), var(--topic-rechnen) calc(50% - 1.5px), var(--topic-rechnen) calc(50% + 1.5px), transparent calc(50% + 1.5px));
+}
+
+/* Ergänzen: extended 1 written small before the Minuend digit */
+.wv-ext { font-size: 1rem; vertical-align: super; color: var(--topic-rechnen); font-weight: 700; margin-right: 1px; }
+
+/* Division steps: line under each subtraction */
+.wv-under { border-bottom: 3px solid var(--ink); }
+.wv-minus { color: var(--ink); }
+.wv-top-div > .wv-cell:first-child { border-color: transparent; }
+.wv-rest { padding-inline: 0.2rem; }
+
+/* empty answer box (task display, print) */
+.wv-box { background: var(--surface); outline: 2px solid var(--border); outline-offset: -4px; }
+
+/* Ziffernrätsel gap */
+.wv-mask {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--primary);
+  background: var(--primary-soft);
+  outline: 2px dashed var(--primary);
+  outline-offset: -3px;
+}
+
+/* highlighted column: tint + dashed outline + ▼ marker */
+
+.written-visual--print .wv-carry,
+.written-visual--print .wv-ext,
+.written-visual--print .wv-marker,
+.written-visual--print .wv-mask { color: var(--ink); }
+.written-visual--print .wv-hl,
+.written-visual--print .wv-mask { background: transparent; }
+.written-visual--print .wv-mask { outline-color: var(--ink); }
+.written-visual--print .wv-struck {
+  background-image: linear-gradient(to top right, transparent calc(50% - 1.5px), var(--ink) calc(50% - 1.5px), var(--ink) calc(50% + 1.5px), transparent calc(50% + 1.5px));
+}
+
+@media print {
+  .wv-carry, .wv-ext, .wv-marker, .wv-mask { color: var(--ink); }
+  .wv-hl, .wv-mask { background: transparent; }
+  .wv-mask { outline-color: var(--ink); }
+  .wv-struck {
+    background-image: linear-gradient(to top right, transparent calc(50% - 1.5px), var(--ink) calc(50% - 1.5px), var(--ink) calc(50% + 1.5px), transparent calc(50% + 1.5px));
+  }
+  .wv-cell { border-color: var(--grid-line); }
+}
+
+/* head row with the place names (they reach to HMrd, at the size of a small label) */
+
+/* Decimal numbers: the comma stands on the line between two columns. */
+.wv-comma { position: absolute; right: -0.2em; bottom: 0.1em; font-weight: 700; line-height: 1; z-index: 1; }
+.wv-padded { color: var(--text-muted); }
+.wv-shift { margin: 0 0 var(--space-2); font-family: var(--font-ui); font-size: var(--fs-small); }

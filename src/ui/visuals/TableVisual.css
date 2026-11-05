@@ -1,0 +1,81 @@
+/* Large, readable data tables. */
+.table-visual-wrap {
+  /* Contains the visually hidden 'Lücke' labels (position: absolute): otherwise they escape the scroll
+     box at their static position and widen the whole page when the table scrolls (large text, 320 px). */
+  position: relative;
+  max-width: 100%;
+  overflow-x: auto;
+  margin-inline: auto;
+}
+.table-visual {
+  border-collapse: collapse;
+  margin-inline: auto;
+  background: var(--surface);
+  font-size: var(--fs-lead);
+  line-height: 1.3;
+}
+.table-visual caption {
+  caption-side: top;
+  padding-bottom: var(--space-2);
+  font-size: var(--fs-body);
+  font-weight: 700;
+  text-align: center;
+}
+.table-visual th,
+.table-visual td {
+  min-width: 3.5rem;
+  height: var(--tap);
+  padding: var(--space-2) var(--space-4);
+  border: 2px solid var(--grid-line);
+  text-align: left;
+  vertical-align: middle;
+}
+/* Phones: a three-column timetable fits without scrolling sideways, and 'Bus A' stays on one line. */
+@media (max-width: 480px) {
+  .table-visual:not(.table-visual--compact) th,
+  .table-visual:not(.table-visual--compact) td { padding-inline: var(--space-2); }
+  .table-visual tbody th { white-space: nowrap; }
+}
+.table-visual--compact { font-size: var(--fs-small); }
+.table-visual--compact th,
+.table-visual--compact td {
+  min-width: 0;
+  padding: var(--space-1);
+  text-align: center;
+}
+.table-visual thead th {
+  background: var(--surface-2);
+  font-weight: 700;
+}
+.table-visual tbody th { font-weight: 650; }
+.table-visual .is-num {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+/* Column headings stay in the text font; only the alignment follows the numbers below. */
+.table-visual thead th.is-num { font-family: inherit; }
+.table-visual__gap {
+  display: inline-block;
+  width: 2.5rem;
+  height: 1.8rem;
+  border: 2px dashed var(--ink);
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+.table-visual-wrap--print .table-visual,
+.table-visual-wrap--print .table-visual th,
+.table-visual-wrap--print .table-visual td { border-color: var(--ink); background: var(--surface); color: var(--ink); }
+
+@media print {
+  .table-visual th, .table-visual td { border-color: var(--ink); background: var(--surface); }
+}
+
+/* Arrows between rows (§6): no frame, and the text stays next to its arrow. */
+.table-visual th.table-visual__arrow,
+.table-visual td.table-visual__arrow { min-width: 0; padding: 0 var(--space-1); border: 0; background: transparent; }
+.table-visual__arrow-body { display: inline-flex; align-items: center; gap: var(--space-1); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.table-visual__arrow--left .table-visual__arrow-body { flex-direction: row-reverse; }
+.table-visual__arrow svg { height: 100%; min-height: 48px; }
+.table-visual__arrow-text { font-size: var(--fs-body); font-weight: 700; }

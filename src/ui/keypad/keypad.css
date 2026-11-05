@@ -1,0 +1,176 @@
+/*
+ * Ziffernblock: Material tonal keys ≥ 56 px, gaps 8 px, sits beside or below the task (never over it).
+ * Hit areas (::before) reach into the gaps and, on phones, to the screen edge. ± and the comma are always in place; an inactive one is visually quiet.
+ */
+.keypad {
+  width: 100%;
+  max-width: 20rem;
+  margin-inline: auto;
+}
+
+.keypad__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(var(--tap-lg), 1fr));
+  gap: var(--gap-tap);
+}
+
+.keypad__key {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap-lg);
+  min-width: var(--tap-lg);
+  padding: var(--space-1);
+  border: none;
+  border-radius: var(--radius-l);
+  background: var(--surface-high);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--fs-digit);
+  font-weight: var(--fw-medium);
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--motion-ms), border-radius var(--motion-ms), transform var(--motion-ms);
+}
+.keypad__key::before,
+.keypad__hint::before,
+.keypad__submit::before {
+  content: '';
+  position: absolute;
+  inset: calc(var(--gap-tap) / -2);
+  z-index: -1;
+}
+.keypad__key::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity var(--motion-ms);
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .keypad__key:hover:not(:disabled)::after { opacity: var(--state-hover); }
+}
+.keypad__key:focus-visible::after { opacity: var(--state-focus); }
+/* Pressed: the key rounds off a little more (Material expressive shape change) and darkens. */
+.keypad__key:active { border-radius: var(--radius-xl); }
+.keypad__key:active::after { opacity: var(--state-pressed); }
+.keypad__key:disabled { opacity: 0.45; cursor: not-allowed; }
+/* Inactive for this skill: in place, but quiet (no fill, muted sign). */
+.keypad__key.is-quiet { background: transparent; color: var(--text-muted); opacity: 0.6; }
+
+.keypad__key--back { background: var(--secondary-soft); color: var(--on-secondary-soft); }
+.keypad__key--back { font-size: var(--fs-lead); }
+.keypad__key--next { background: var(--secondary-soft); color: var(--on-secondary-soft); }
+.keypad__sub {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: var(--fw-medium);
+  margin-top: 2px;
+}
+
+.keypad__submit {
+  grid-column: 1 / -1;
+  width: 100%;
+  border-radius: var(--radius-l);
+}
+.keypad__submit--with-hint { grid-column: span 2; }
+.keypad__hint {
+  min-height: var(--tap-lg);
+  padding-inline: var(--space-2);
+  gap: var(--space-1);
+  border-radius: var(--radius-l);
+  font-size: var(--fs-body);
+  line-height: 1.15;
+}
+.keypad__hint svg { flex: none; color: var(--primary); }
+.keypad__hint[aria-disabled='true'] { font-size: var(--fs-small); }
+.keypad__hint[aria-disabled='true'] svg { color: inherit; }
+
+/*
+ * Phones (the keypad sits below the task): 4 columns × 4 rows instead of 3 × 6, so the task, the answer field and the whole keypad fit on the screen
+ * together. Keys stay ≥ 56 px (4 × 56 + 3 × 8 = 248 px, plus the page's 16 px gutters: from 280 px).
+ *   7 8 9 ⌫
+ *   4 5 6 ±
+ *   1 2 3 ,
+ *   0 Tipp Prüfen Prüfen
+ */
+@media (max-width: 899px) {
+  .keypad { max-width: none; }
+}
+@media (max-width: 899px) {
+  .keypad--with-hint .keypad__grid {
+    grid-template-columns: repeat(4, minmax(var(--tap-lg), 1fr));
+    grid-template-areas:
+      'd7 d8 d9 back'
+      'd4 d5 d6 minus'
+      'd1 d2 d3 comma'
+      'd0 hint submit submit';
+  }
+  .keypad--with-hint .keypad__key--d7 { grid-area: d7; }
+  .keypad--with-hint .keypad__key--d8 { grid-area: d8; }
+  .keypad--with-hint .keypad__key--d9 { grid-area: d9; }
+  .keypad--with-hint .keypad__key--d4 { grid-area: d4; }
+  .keypad--with-hint .keypad__key--d5 { grid-area: d5; }
+  .keypad--with-hint .keypad__key--d6 { grid-area: d6; }
+  .keypad--with-hint .keypad__key--d1 { grid-area: d1; }
+  .keypad--with-hint .keypad__key--d2 { grid-area: d2; }
+  .keypad--with-hint .keypad__key--d3 { grid-area: d3; }
+  .keypad--with-hint .keypad__key--d0 { grid-area: d0; }
+  .keypad--with-hint .keypad__key--minus { grid-area: minus; }
+  .keypad--with-hint .keypad__key--comma { grid-area: comma; }
+  .keypad--with-hint .keypad__key--back { grid-area: back; }
+  .keypad--with-hint .keypad__hint { grid-area: hint; flex-direction: column; gap: 0; padding: var(--space-1); font-size: var(--fs-small); }
+  .keypad--with-hint .keypad__hint[aria-disabled='true'] { font-size: 0.85rem; }
+  .keypad--with-hint .keypad__submit { grid-area: submit; }
+  /* A fraction: ↓ takes a place in the last row. ± and the comma stay where they are. */
+  .keypad--with-hint.keypad--with-next .keypad__grid {
+    grid-template-areas:
+      'd7 d8 d9 back'
+      'd4 d5 d6 minus'
+      'd1 d2 d3 comma'
+      'd0 next hint submit';
+  }
+  .keypad--with-hint .keypad__key--next { grid-area: next; }
+}
+
+/* Wide screens (beside the task): 3 columns: digits, then ± 0 , and then ⌫, Tipp, Prüfen. */
+@media (min-width: 900px) {
+  .keypad--with-hint .keypad__key--back { grid-column: 1; }
+  .keypad--with-hint .keypad__hint { grid-column: 2 / -1; }
+  .keypad--with-hint.keypad--with-next .keypad__hint { grid-column: auto; }
+  .keypad--with-hint .keypad__submit { grid-column: 1 / -1; }
+}
+
+/* Short phones: keys down to 48 px in height (still 56 px or more wide), so that Prüfen stays on the screen together with the task. */
+@media (max-width: 899px) and (max-height: 740px) {
+  .keypad__key,
+  .keypad__hint,
+  .keypad__submit { min-height: var(--tap); }
+}
+
+/* Phones: the page gutter is 16 px, and the outer keys take it into their hit areas (the screen edge is easy to hit). */
+@media (max-width: 480px) {
+  .keypad__key--d7::before,
+  .keypad__key--d4::before,
+  .keypad__key--d1::before,
+  .keypad__key--d0::before { left: calc(-1 * var(--space-4)); }
+  .keypad__key--back::before,
+  .keypad__key--minus::before,
+  .keypad__key--comma::before,
+  .keypad__submit::before { right: calc(-1 * var(--space-4)); }
+}
+
+@media print {
+  .keypad { display: none !important; }
+}

@@ -1,0 +1,10 @@
+/* A term and its next steps. Colours only from tokens.css. The next step: tint plus thick underline, never colour alone. */
+.term-visual { display: block; width: max-content; max-width: 100%; overflow-x: auto; padding: var(--space-2); margin-inline: auto; }
+.term-line { margin: 0; max-width: none; font-family: var(--font-mono); font-size: clamp(1.125rem, 5vw, var(--fs-lead)); line-height: 1.5; white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--ink); }
+.term-line + .term-line { margin-top: var(--space-1); }
+.term-next { background: var(--retry-soft); color: inherit; border-bottom: 3px solid var(--ink); padding-inline: 0.1em; }
+.term-bracket { line-height: 1; vertical-align: -0.05em; }
+.term-visual--print .term-next { background: none; }
+@media print {
+  .term-next { background: none; }
+}
